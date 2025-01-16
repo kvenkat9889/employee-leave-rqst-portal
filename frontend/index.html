@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Leave Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            width: 95%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Tab Styles */
+        .tabs {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            color: #666;
+        }
+
+        .tab-button.active {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .leave-request {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+
+        .checkbox-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .reject-btn {
+            background-color: #f44336;
+        }
+
+        .clear-btn {
+            background-color: #ff9800;
+        }
+
+        .delete-btn {
+            background-color: #d32f2f;
+        }
+
+        .status-pending { color: #ff9800; }
+        .status-approved { color: #4CAF50; }
+        .status-rejected { color: #f44336; }
+
+        .action-bar {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HR Leave Management Portal</h1>
+       
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('pending')">Pending Requests</button>
+            <button class="tab-button" onclick="switchTab('all')">All Leave Records</button>
+        </div>
+
+        <!-- Pending Requests Tab -->
+        <div id="pendingTab" class="tab-content active">
+            <div id="leaveRequests"></div>
+        </div>
+
+        <!-- All Records Tab -->
+        <div id="allTab" class="tab-content">
+            <div class="action-bar">
+                <div>
+                    <button onclick="toggleSelectAll()" id="selectAllBtn">Select All</button>
+                    <button class="delete-btn" onclick="showDeleteConfirmation()">Delete Selected</button>
+                    <button class="clear-btn" onclick="showClearOptions()">Clear Records</button>
+                </div>
+                <div>
+                    <select id="filterStatus" onchange="filterRecords()">
+                        <option value="all">All Status</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+            <div id="allLeaveHistory"></div>
+        </div>
+    </div>
+
+    <!-- Modals remain the same -->
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <h2>Clear Records</h2>
+            <p>Choose records to clear:</p>
+            <select id="clearOption">
+                <option value="older-than-30">Older than 30 days</option>
+                <option value="older-than-60">Older than 60 days</option>
+                <option value="older-than-90">Older than 90 days</option>
+                <option value="completed">All completed requests</option>
+                <option value="rejected">All rejected requests</option>
+            </select>
+            <div class="modal-buttons">
+                <button onclick="closeModal('clearModal')">Cancel</button>
+                <button class="clear-btn" onclick="clearRecords()">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete the selected records? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="delete-btn" onclick="deleteSelectedRecords()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let leaveRequests = JSON.parse(localStorage.getItem('leaveRequests')) || [];
+        let selectedRecords = new Set();
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+
+        function displayLeaveRequests() {
+            const pendingRequests = leaveRequests.filter(request => request.status === 'pending');
+            const requestsContainer = document.getElementById('leaveRequests');
+            requestsContainer.innerHTML = '';
+
+            pendingRequests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'leave-request';
+                requestElement.innerHTML = `
+                    <p><strong>Employee ID:</strong> ${request.employeeId}</p>
+                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>End Date:</strong> ${request.endDate}</p>
+                    <p><strong>Reason:</strong> ${request.reason}</p>
+                    <button onclick="updateLeaveStatus(${request.id}, 'approved')">Approve</button>
+                    <button class="reject-btn" onclick="updateLeaveStatus(${request.id}, 'rejected')">Reject</button>
+                `;
+                requestsContainer.appendChild(requestElement);
+            });
+        }
+
+        function displayAllLeaveHistory() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const historyContainer = document.getElementById('allLeaveHistory');
+            historyContainer.innerHTML = '';
+
+            let filteredRequests = leaveRequests;
+            if (statusFilter !== 'all') {
+                filteredRequests = leaveRequests.filter(request => request.status === statusFilter);
+            }
+
+            filteredRequests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'leave-request';
+                requestElement.innerHTML = `
+                    <div class="checkbox-container">
+                        <input type="checkbox" onchange="toggleRecordSelection(${request.id})"
+                        ${selectedRecords.has(request.id) ? 'checked' : ''}>
+                    </div>
+                    <p><strong>Employee ID:</strong> ${request.employeeId}</p>
+                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>End Date:</strong> ${request.endDate}</p>
+                    <p><strong>Status:</strong> <span class="status-${request.status}">${request.status}</span></p>
+                    <p><strong>Request Date:</strong> ${new Date(request.requestDate).toLocaleDateString()}</p>
+                `;
+                historyContainer.appendChild(requestElement);
+            });
+        }
+
+        function updateLeaveStatus(requestId, status) {
+            const requestIndex = leaveRequests.findIndex(request => request.id === requestId);
+            if (requestIndex !== -1) {
+                leaveRequests[requestIndex].status = status;
+                localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+                displayLeaveRequests();
+                displayAllLeaveHistory();
+            }
+        }
+
+        function showClearOptions() {
+            document.getElementById('clearModal').style.display = 'block';
+        }
+
+        function showDeleteConfirmation() {
+            if (selectedRecords.size > 0) {
+                document.getElementById('deleteModal').style.display = 'block';
+            } else {
+                alert('Please select records to delete');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function clearRecords() {
+            const option = document.getElementById('clearOption').value;
+            const currentDate = new Date();
+
+            switch(option) {
+                case 'older-than-30':
+                case 'older-than-60':
+                case 'older-than-90':
+                    const days = parseInt(option.match(/\d+/)[0]);
+                    const cutoffDate = new Date(currentDate.setDate(currentDate.getDate() - days));
+                    leaveRequests = leaveRequests.filter(request =>
+                        new Date(request.requestDate) > cutoffDate
+                    );
+                    break;
+                case 'completed':
+                    leaveRequests = leaveRequests.filter(request =>
+                        request.status !== 'approved'
+                    );
+                    break;
+                case 'rejected':
+                    leaveRequests = leaveRequests.filter(request =>
+                        request.status !== 'rejected'
+                    );
+                    break;
+            }
+
+            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            closeModal('clearModal');
+            selectedRecords.clear();
+            displayLeaveRequests();
+            displayAllLeaveHistory();
+        }
+
+        function toggleRecordSelection(id) {
+            if (selectedRecords.has(id)) {
+                selectedRecords.delete(id);
+            } else {
+                selectedRecords.add(id);
+            }
+        }
+
+        function toggleSelectAll() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+           
+            if (selectedRecords.size < leaveRequests.length) {
+                leaveRequests.forEach(request => selectedRecords.add(request.id));
+                selectAllBtn.textContent = 'Deselect All';
+            } else {
+                selectedRecords.clear();
+                selectAllBtn.textContent = 'Select All';
+            }
+           
+            displayAllLeaveHistory();
+        }
+
+        function deleteSelectedRecords() {
+            leaveRequests = leaveRequests.filter(request => !selectedRecords.has(request.id));
+            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            selectedRecords.clear();
+            closeModal('deleteModal');
+            displayLeaveRequests();
+            displayAllLeaveHistory();
+        }
+
+        function filterRecords() {
+            displayAllLeaveHistory();
+        }
+
+        // Initial display
+        displayLeaveRequests();
+        displayAllLeaveHistory();
+    </script>
+</body>
+</html>
