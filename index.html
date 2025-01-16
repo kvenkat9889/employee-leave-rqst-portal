@@ -3,390 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Leave Request</title>
-    <style>
-        * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-}
-
-body {
-    background-color: #f0f2f5;
-    padding: 30px;
-    font-size: 16px;
-    color: #333;
-}
-
-.container {
-    width: 90%;
-    margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    max-width: 1200px;
-}
-
-h1 {
-    margin-bottom: 30px;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #2C3E50; /* Dark blue-gray for a more formal and elegant look */
-    letter-spacing: -0.5px;
-    text-transform: uppercase;
-    font-family: 'Merriweather', serif; /* Elegant serif font for a more formal look */
-    position: relative;
-}
-
-h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, #4CAF50, #FF9800); /* Soft gradient underline */
-    transform: scaleX(0);
-    transform-origin: bottom right;
-    transition: transform 0.4s ease-in-out;
-}
-
-h1:hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
-}
-
-h1:hover {
-    color: #4CAF50; /* Green on hover to add a touch of vibrancy */
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow to add depth */
-}
-
-
-.tabs {
-    display: flex;
-    margin-bottom: 25px;
-    justify-content: flex-start;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 5px;
-}
-
-.tab-button {
-    padding: 12px 25px;
-    background: none;
-    border: none;
-    color: #777;
-    font-size: 18px;
-    font-weight: 500;
-    margin-right: 15px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.tab-button:hover {
-    color: #4CAF50;
-}
-
-.tab-button.active {
-    color: #4CAF50;
-    border-bottom: 3px solid #4CAF50;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: 500;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    color: #444;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input:focus, select:focus, textarea:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
-}
-
-.error {
-    color: #e53935;
-    font-size: 0.875rem;
-    margin-top: 5px;
-    display: none;
-}
-
-button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    padding: 14px 25px;
-    border: none;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button[type="submit"]:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-button[type="submit"]:hover:not(:disabled) {
-    background-color: #45a049;
-}
-
-.leave-request {
-    background: #ffffff;
-    padding: 18px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.status-pending {
-    color: #FF9800;
-    font-weight: 600;
-}
-
-.status-approved {
-    color: #4CAF50;
-    font-weight: 600;
-}
-
-.status-rejected {
-    color: #F44336;
-    font-weight: 600;
-}
-
-#employeeLeaveHistory {
-    margin-top: 25px;
-    max-height: 450px;
-    overflow-y: auto;
-    padding-right: 15px;
-    border-right: 5px solid #f1f1f1;
-    background-color: #fafafa;
-    border-radius: 8px;
-}
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Employee Leave Request Portal</h1>
-       
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'requestTab')">New Request</button>
-            <button class="tab-button" onclick="openTab(event, 'historyTab')">Leave History</button>
-        </div>
-
-        <div id="requestTab" class="tab-content active">
-            <form id="leaveRequestForm" onsubmit="return submitLeaveRequest(event)">
-                <div class="form-group">
-                    <label for="empid">Employee ID:</label>
-                    <input type="text" id="empid" name="empid" required>
-                    <div class="error" id="empidError">Please enter a valid Employee ID (3 uppercase letters followed by 0 and 3 digits)</div>
-                </div>
-                <div class="form-group">
-                    <label for="leaveType">Leave Type:</label>
-                    <select id="leaveType" required>
-                        <option value="annual">Annual Leave</option>
-                        <option value="sick">Sick Leave</option>
-                        <option value="personal">Personal Leave</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" required>
-                    <div class="error" id="startDateError">Start date cannot be in the past</div>
-                </div>
-                <div class="form-group">
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" required>
-                    <div class="error" id="endDateError">End date must be after start date</div>
-                </div>
-                <div class="form-group">
-                    <label for="reason">Reason:</label>
-                    <textarea id="reason" rows="4" required></textarea>
-                    <div class="error" id="reasonError">Reason must be at least 5 characters long</div>
-                </div>
-                <button type="submit" id="submitBtn" disabled>Submit Request</button>
-            </form>
-        </div>
-
-        <div id="historyTab" class="tab-content">
-            <div id="employeeLeaveHistory"></div>
-        </div>
-    </div>
-
-    <script>
-        let leaveRequests = JSON.parse(localStorage.getItem('leaveRequests')) || [];
-       
-        // Set minimum date for date inputs to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('startDate').min = today;
-        document.getElementById('endDate').min = today;
-
-        function openTab(evt, tabName) {
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let content of tabContents) {
-                content.classList.remove("active");
-            }
-
-            const tabButtons = document.getElementsByClassName("tab-button");
-            for (let button of tabButtons) {
-                button.classList.remove("active");
-            }
-
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-
-            if (tabName === 'historyTab') {
-                const empId = document.getElementById('empid').value;
-                if (empId) {
-                    displayEmployeeLeaveHistory(empId);
-                }
-            }
-        }
-
-        function validateForm() {
-            let isValid = true;
-            const empid = document.getElementById('empid').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const reason = document.getElementById('reason').value;
-
-            // Validate Employee ID
-            const empIdRegex = /^[A-Z]{3}0\d{3}$/;
-            if (!empIdRegex.test(empid)) {
-                document.getElementById('empidError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('empidError').style.display = 'none';
-            }
-
-            // Validate dates
-            const startDateTime = new Date(startDate);
-            const endDateTime = new Date(endDate);
-            const todayDateTime = new Date();
-            todayDateTime.setHours(0, 0, 0, 0);
-
-            if (startDateTime < todayDateTime) {
-                document.getElementById('startDateError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('startDateError').style.display = 'none';
-            }
-
-            if (endDateTime < startDateTime) {
-                document.getElementById('endDateError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('endDateError').style.display = 'none';
-            }
-
-            // Validate reason
-            if (reason.length < 5) {
-                document.getElementById('reasonError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('reasonError').style.display = 'none';
-            }
-
-            document.getElementById('submitBtn').disabled = !isValid;
-            return isValid;
-        }
-
-        // Add validation listeners to all form fields
-        document.getElementById('empid').addEventListener('input', validateForm);
-        document.getElementById('startDate').addEventListener('change', validateForm);
-        document.getElementById('endDate').addEventListener('change', validateForm);
-        document.getElementById('reason').addEventListener('input', validateForm);
-
-        function submitLeaveRequest(event) {
-            event.preventDefault();
-           
-            if (!validateForm()) {
-                return false;
-            }
-
-            const request = {
-                id: Date.now(),
-                employeeId: document.getElementById('empid').value,
-                leaveType: document.getElementById('leaveType').value,
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                reason: document.getElementById('reason').value,
-                status: 'pending',
-                requestDate: new Date().toISOString()
-            };
-
-            leaveRequests.push(request);
-            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
-           
-            alert('Leave request submitted successfully');
-            document.getElementById('leaveRequestForm').reset();
-            displayEmployeeLeaveHistory(request.employeeId);
-            return false;
-        }
-
-        function displayEmployeeLeaveHistory(employeeId) {
-            const employeeRequests = leaveRequests.filter(request =>
-                request.employeeId === employeeId
-            );
-            const historyContainer = document.getElementById('employeeLeaveHistory');
-            historyContainer.innerHTML = '';
-
-            if (employeeRequests.length === 0) {
-                historyContainer.innerHTML = '<p>No leave requests found for this employee.</p>';
-                return;
-            }
-
-            employeeRequests.forEach(request => {
-                const requestElement = document.createElement('div');
-                requestElement.className = 'leave-request';
-                requestElement.innerHTML = `
-                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
-                    <p><strong>Start Date:</strong> ${request.startDate}</p>
-                    <p><strong>End Date:</strong> ${request.endDate}</p>
-                    <p><strong>Reason:</strong> ${request.reason}</p>
-                    <p><strong>Status:</strong> <span class="status-${request.status}">${request.status}</span></p>
-                    <p><strong>Request Date:</strong> ${new Date(request.requestDate).toLocaleDateString()}</p>
-                `;
-                historyContainer.appendChild(requestElement);
-            });
-        }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Leave Management</title>
+    <title>Employee Leave Request Portal & HR Leave Management</title>
     <style>
         * {
             box-sizing: border-box;
@@ -454,6 +71,37 @@ button[type="submit"]:hover:not(:disabled) {
             display: block;
         }
 
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            display: none;
+            color: red;
+            font-size: 12px;
+        }
+
         .leave-request {
             background: #f9f9f9;
             padding: 15px;
@@ -462,7 +110,6 @@ button[type="submit"]:hover:not(:disabled) {
             border: 1px solid #ddd;
             position: relative;
         }
-
         .checkbox-container {
             position: absolute;
             top: 10px;
@@ -494,7 +141,6 @@ button[type="submit"]:hover:not(:disabled) {
         .delete-btn {
             background-color: #d32f2f;
         }
-
         .status-pending { color: #ff9800; }
         .status-approved { color: #4CAF50; }
         .status-rejected { color: #f44336; }
@@ -542,9 +188,59 @@ button[type="submit"]:hover:not(:disabled) {
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>HR Leave Management Portal</h1>
-       
+        <!-- Employee Leave Request Portal Section -->
+        <h1>Employee Leave Request Portal</h1>
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'requestTab')">New Request</button>
+            <button class="tab-button" onclick="openTab(event, 'historyTab')">Leave History</button>
+        </div>
+
+        <!-- New Request Tab -->
+        <div id="requestTab" class="tab-content active">
+            <form id="leaveRequestForm" onsubmit="return submitLeaveRequest(event)">
+                <div class="form-group">
+                    <label for="empid">Employee ID:</label>
+                    <input type="text" id="empid" name="empid" required>
+                    <div class="error" id="empidError">Please enter a valid Employee ID (3 uppercase letters followed by 0 and 3 digits)</div>
+                </div>
+                <div class="form-group">
+                    <label for="leaveType">Leave Type:</label>
+                    <select id="leaveType" required>
+                        <option value="annual">Annual Leave</option>
+                        <option value="sick">Sick Leave</option>
+                        <option value="personal">Personal Leave</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" required>
+                    <div class="error" id="startDateError">Start date cannot be earlier than today.</div>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" required>
+                    <div class="error" id="endDateError">End date cannot be earlier than start date.</div>
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason:</label>
+                    <textarea id="reason" rows="4" required></textarea>
+                </div>
+                <button type="submit">Submit Request</button>
+            </form>
+        </div>
+
+        <!-- Leave History Tab -->
+        <div id="historyTab" class="tab-content">
+            <div id="leaveHistory"></div>
+        </div>
+    </div>
+
+    <!-- HR Leave Management Portal Section -->
+    <div class="container">
+        <h2>HR Leave Management Portal</h2>
+
         <!-- Tabs Navigation -->
         <div class="tabs">
             <button class="tab-button active" onclick="switchTab('pending')">Pending Requests</button>
@@ -577,60 +273,103 @@ button[type="submit"]:hover:not(:disabled) {
         </div>
     </div>
 
-    <!-- Modals remain the same -->
-    <div id="clearModal" class="modal">
-        <div class="modal-content">
-            <h2>Clear Records</h2>
-            <p>Choose records to clear:</p>
-            <select id="clearOption">
-                <option value="older-than-30">Older than 30 days</option>
-                <option value="older-than-60">Older than 60 days</option>
-                <option value="older-than-90">Older than 90 days</option>
-                <option value="completed">All completed requests</option>
-                <option value="rejected">All rejected requests</option>
-            </select>
-            <div class="modal-buttons">
-                <button onclick="closeModal('clearModal')">Cancel</button>
-                <button class="clear-btn" onclick="clearRecords()">Clear</button>
-            </div>
+<!-- Modals remain the same -->
+<div id="clearModal" class="modal">
+    <div class="modal-content">
+        <h2>Clear Records</h2>
+        <p>Choose records to clear:</p>
+        <select id="clearOption">
+            <option value="older-than-30">Older than 30 days</option>
+            <option value="older-than-60">Older than 60 days</option>
+            <option value="older-than-90">Older than 90 days</option>
+            <option value="completed">All completed requests</option>
+            <option value="rejected">All rejected requests</option>
+        </select>
+        <div class="modal-buttons">
+            <button onclick="closeModal('clearModal')">Cancel</button>
+            <button class="clear-btn" onclick="clearRecords()">Clear</button>
         </div>
     </div>
+</div>
 
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h2>Confirm Delete</h2>
-            <p>Are you sure you want to delete the selected records? This action cannot be undone.</p>
-            <div class="modal-buttons">
-                <button onclick="closeModal('deleteModal')">Cancel</button>
-                <button class="delete-btn" onclick="deleteSelectedRecords()">Delete</button>
-            </div>
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete the selected records? This action cannot be undone.</p>
+        <div class="modal-buttons">
+            <button onclick="closeModal('deleteModal')">Cancel</button>
+            <button class="delete-btn" onclick="deleteSelectedRecords()">Delete</button>
         </div>
     </div>
+</div>
 
     <script>
         let leaveRequests = JSON.parse(localStorage.getItem('leaveRequests')) || [];
         let selectedRecords = new Set();
 
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
         function switchTab(tabName) {
-            // Update tab buttons
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
             document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-            // Update tab content
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(`${tabName}Tab`).classList.add('active');
         }
 
-        function displayLeaveRequests() {
-            const pendingRequests = leaveRequests.filter(request => request.status === 'pending');
-            const requestsContainer = document.getElementById('leaveRequests');
-            requestsContainer.innerHTML = '';
+        function submitLeaveRequest(event) {
+            event.preventDefault();
 
-            pendingRequests.forEach(request => {
+            let employeeId = document.getElementById('empid').value;
+            let leaveType = document.getElementById('leaveType').value;
+            let startDate = document.getElementById('startDate').value;
+            let endDate = document.getElementById('endDate').value;
+            let reason = document.getElementById('reason').value;
+
+            let newRequest = {
+                id: new Date().getTime(),
+                employeeId,
+                leaveType,
+                startDate,
+                endDate,
+                reason,
+                status: 'pending',
+                requestDate: new Date().toISOString()
+            };
+
+            leaveRequests.push(newRequest);
+            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            alert('Leave request submitted successfully!');
+
+            // Clear form
+            document.getElementById('leaveRequestForm').reset();
+
+            // Update history view
+            openTab(event, 'historyTab');
+            displayLeaveHistory();
+        }
+
+        function displayLeaveHistory() {
+            const historyContainer = document.getElementById('leaveHistory');
+            historyContainer.innerHTML = '';
+
+            leaveRequests.forEach(request => {
                 const requestElement = document.createElement('div');
                 requestElement.className = 'leave-request';
                 requestElement.innerHTML = `
@@ -639,54 +378,37 @@ button[type="submit"]:hover:not(:disabled) {
                     <p><strong>Start Date:</strong> ${request.startDate}</p>
                     <p><strong>End Date:</strong> ${request.endDate}</p>
                     <p><strong>Reason:</strong> ${request.reason}</p>
-                    <button onclick="updateLeaveStatus(${request.id}, 'approved')">Approve</button>
-                    <button class="reject-btn" onclick="updateLeaveStatus(${request.id}, 'rejected')">Reject</button>
-                `;
-                requestsContainer.appendChild(requestElement);
-            });
-        }
-
-        function displayAllLeaveHistory() {
-            const statusFilter = document.getElementById('filterStatus').value;
-            const historyContainer = document.getElementById('allLeaveHistory');
-            historyContainer.innerHTML = '';
-
-            let filteredRequests = leaveRequests;
-            if (statusFilter !== 'all') {
-                filteredRequests = leaveRequests.filter(request => request.status === statusFilter);
-            }
-
-            filteredRequests.forEach(request => {
-                const requestElement = document.createElement('div');
-                requestElement.className = 'leave-request';
-                requestElement.innerHTML = `
-                    <div class="checkbox-container">
-                        <input type="checkbox" onchange="toggleRecordSelection(${request.id})"
-                        ${selectedRecords.has(request.id) ? 'checked' : ''}>
-                    </div>
-                    <p><strong>Employee ID:</strong> ${request.employeeId}</p>
-                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
-                    <p><strong>Start Date:</strong> ${request.startDate}</p>
-                    <p><strong>End Date:</strong> ${request.endDate}</p>
-                    <p><strong>Status:</strong> <span class="status-${request.status}">${request.status}</span></p>
                     <p><strong>Request Date:</strong> ${new Date(request.requestDate).toLocaleDateString()}</p>
+                    <p class="status-${request.status}"><strong>Status:</strong> ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}</p>
                 `;
                 historyContainer.appendChild(requestElement);
             });
         }
-
-        function updateLeaveStatus(requestId, status) {
-            const requestIndex = leaveRequests.findIndex(request => request.id === requestId);
-            if (requestIndex !== -1) {
-                leaveRequests[requestIndex].status = status;
-                localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
-                displayLeaveRequests();
-                displayAllLeaveHistory();
+        function toggleRecordSelection(id) {
+            if (selectedRecords.has(id)) {
+                selectedRecords.delete(id);
+            } else {
+                selectedRecords.add(id);
             }
         }
 
-        function showClearOptions() {
-            document.getElementById('clearModal').style.display = 'block';
+        function toggleSelectAll() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const selectAllBtn = document.querySelector('button[onclick="toggleSelectAll()"]');
+
+            if (selectedRecords.size < leaveRequests.length) {
+                leaveRequests.forEach(request => selectedRecords.add(request.id));
+                selectAllBtn.textContent = 'Deselect All';
+            } else {
+                selectedRecords.clear();
+                selectAllBtn.textContent = 'Select All';
+            }
+
+            displayLeaveRequests();
+        }
+
+        function filterRecords() {
+            displayLeaveRequests();
         }
 
         function showDeleteConfirmation() {
@@ -697,15 +419,27 @@ button[type="submit"]:hover:not(:disabled) {
             }
         }
 
+        function deleteSelectedRecords() {
+            leaveRequests = leaveRequests.filter(request => !selectedRecords.has(request.id));
+            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+            selectedRecords.clear();
+            closeModal('deleteModal');
+            displayLeaveRequests();
+        }
+
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showClearOptions() {
+            document.getElementById('clearModal').style.display = 'block';
         }
 
         function clearRecords() {
             const option = document.getElementById('clearOption').value;
             const currentDate = new Date();
 
-            switch(option) {
+            switch (option) {
                 case 'older-than-30':
                 case 'older-than-60':
                 case 'older-than-90':
@@ -731,48 +465,72 @@ button[type="submit"]:hover:not(:disabled) {
             closeModal('clearModal');
             selectedRecords.clear();
             displayLeaveRequests();
-            displayAllLeaveHistory();
         }
 
-        function toggleRecordSelection(id) {
-            if (selectedRecords.has(id)) {
-                selectedRecords.delete(id);
-            } else {
-                selectedRecords.add(id);
+        function displayLeaveRequests() {
+            const pendingRequests = leaveRequests.filter(request => request.status === 'pending');
+            const requestsContainer = document.getElementById('leaveRequests');
+            requestsContainer.innerHTML = '';
+
+            pendingRequests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'leave-request';
+                requestElement.innerHTML = `
+                    <p><strong>Employee ID:</strong> ${request.employeeId}</p>
+                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>End Date:</strong> ${request.endDate}</p>
+                    <p><strong>Reason:</strong> ${request.reason}</p>
+                    <p><strong>Request Date:</strong> ${new Date(request.requestDate).toLocaleDateString()}</p>
+                    <button onclick="updateLeaveStatus(${request.id}, 'approved')">Approve</button>
+                    <button class="reject-btn" onclick="updateLeaveStatus(${request.id}, 'rejected')">Reject</button>
+                `;
+                requestsContainer.appendChild(requestElement);
+            });
+        }
+
+        function updateLeaveStatus(requestId, status) {
+            const requestIndex = leaveRequests.findIndex(request => request.id === requestId);
+            if (requestIndex !== -1) {
+                leaveRequests[requestIndex].status = status;
+                localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
+                displayLeaveRequests();
+                displayLeaveHistory();
             }
         }
 
-        function toggleSelectAll() {
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            const selectAllBtn = document.getElementById('selectAllBtn');
-           
-            if (selectedRecords.size < leaveRequests.length) {
-                leaveRequests.forEach(request => selectedRecords.add(request.id));
-                selectAllBtn.textContent = 'Deselect All';
-            } else {
-                selectedRecords.clear();
-                selectAllBtn.textContent = 'Select All';
-            }
-           
-            displayAllLeaveHistory();
-        }
-
-        function deleteSelectedRecords() {
-            leaveRequests = leaveRequests.filter(request => !selectedRecords.has(request.id));
-            localStorage.setItem('leaveRequests', JSON.stringify(leaveRequests));
-            selectedRecords.clear();
-            closeModal('deleteModal');
-            displayLeaveRequests();
-            displayAllLeaveHistory();
-        }
-
+        // Filter records by status
         function filterRecords() {
-            displayAllLeaveHistory();
+            const status = document.getElementById('filterStatus').value;
+            const filteredRequests = leaveRequests.filter(request => status === 'all' || request.status === status);
+
+            const allHistoryContainer = document.getElementById('allLeaveHistory');
+            allHistoryContainer.innerHTML = '';
+
+            filteredRequests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'leave-request';
+                requestElement.innerHTML = `
+                <div class="checkbox-container">
+                        <input type="checkbox" onchange="toggleRecordSelection(${request.id})" ${selectedRecords.has(request.id) ? 'checked' : ''}>
+                    </div>
+                    <p><strong>Employee ID:</strong> ${request.employeeId}</p>
+                    <p><strong>Leave Type:</strong> ${request.leaveType}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>End Date:</strong> ${request.endDate}</p>
+                    <p><strong>Reason:</strong> ${request.reason}</p>
+                    <p><strong>Request Date:</strong> ${new Date(request.requestDate).toLocaleDateString()}</p>
+                    <p class="status-${request.status}"><strong>Status:</strong> ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}</p>
+                `;
+                allHistoryContainer.appendChild(requestElement);
+            });
         }
 
-        // Initial display
+        // Load and display leave requests on page load
         displayLeaveRequests();
-        displayAllLeaveHistory();
+        displayLeaveHistory();
+        filterRecords();
     </script>
+
 </body>
 </html>
